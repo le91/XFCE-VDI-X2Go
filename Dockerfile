@@ -73,6 +73,7 @@ RUN apt-get install -y --no-install-recommends \
     unzip \
     unrar \
     ffmpeg \
+	dpkg \
     pwgen \
     nano \
     file \
@@ -122,8 +123,8 @@ RUN rm -rf /etc/ssh/ssh_host_* && ssh-keygen -A
 RUN apt-get clean -y && rm -rf /usr/share/doc/* /var/lib/apt/lists/* /tmp/* /var/tmp/* /var/cache/apk/*
 
 # Update timezone to The Netherlands
-RUN echo 'Europe/Amsterdam' >/etc/timezone
-RUN unlink /etc/localtime && ln -s /usr/share/zoneinfo/Europe/Amsterdam /etc/localtime
+RUN echo 'Asia/Almaty' >/etc/timezone
+RUN unlink /etc/localtime && ln -s /usr/share/zoneinfo/Asia/Almaty /etc/localtime
 
 # Start default XFCE4 panels (don't ask for it)
 RUN mv -f /etc/xdg/xfce4/panel/default.xml /etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml
@@ -135,7 +136,11 @@ COPY ./configs/xfce4-settings.desktop /etc/xdg/autostart/
 RUN sed -i "s/Hidden=.*/Hidden=false/" /etc/xdg/autostart/xfce4-clipman-plugin-autostart.desktop
 # Remove unnecessary existing start-up apps
 RUN rm -rf /etc/xdg/autostart/light-locker.desktop /etc/xdg/autostart/xscreensaver.desktop
-
+# Install Wine
+RUN dpkg --add-architecture i386 && wget -qO - https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add - 
+RUN apt-add-repository https://dl.winehq.org/wine-builds/debian/ 
+RUN apt update && apt install --install-recommends winehq-stable 
+RUN export PATH=$PATH:/opt/wine-stable/bin 
 # Disable root shell
 RUN usermod -s /usr/sbin/nologin root
 
@@ -151,6 +156,7 @@ COPY ./configs/whiskermenu-1.rc ./
 COPY ./scripts/xfce_settings.sh ./
 COPY ./scripts/run.sh ./
 # Print hello during worker bash start-up
+RUN export PATH=$PATH:/opt/wine-stable/bin 
 RUN echo 'echo "Info: Thank you for using Melroys VDI XFCE Docker image!"' >>/app/.bashrc
 
 # Run as worker

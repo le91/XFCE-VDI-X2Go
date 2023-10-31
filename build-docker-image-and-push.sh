@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-docker build --tag danger89/xfcevdi_x2go .
-docker push danger89/xfcevdi_x2go
+docker build --tag le91/xfcevdi_x2go .
+docker push le91/xfcevdi_x2go
